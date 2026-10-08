@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Registro de estado de ánimo</title>
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; margin: 0; background: #f7fafc; color: #1f2d3d; padding: 60px 24px; }
+    main { max-width: 480px; margin: 0 auto; }
+    h1 { color: #051c2c; font-size: 2rem; text-align: center; }
+    form { background: #ffffff; padding: 28px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+    label.campo { display: block; font-weight: bold; margin-bottom: 18px; }
+    input[type="text"], textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; font-size: 1rem; font-family: inherit; border: 1px solid #c4cdd6; border-radius: 6px; }
+    textarea { min-height: 100px; resize: vertical; }
+    fieldset { border: none; padding: 0; margin: 0 0 18px; }
+    legend { font-weight: bold; margin-bottom: 8px; }
+    .escala { display: flex; justify-content: space-between; gap: 8px; }
+    .escala label { flex: 1; text-align: center; cursor: pointer; }
+    .escala small { display: block; color: #5a6b7d; font-size: 0.8rem; margin-top: 4px; }
+    .boton-enviar { width: 100%; padding: 14px; font-size: 1.1rem; font-family: inherit; color: #ffffff; background: #1e6fd9; border: none; border-radius: 8px; cursor: pointer; }
+    .boton-enviar:hover { background: #1858b0; }
+    .boton-enviar:disabled { background: #8fb4e8; cursor: default; }
+    #mensaje { margin-top: 20px; padding: 14px; border-radius: 8px; display: none; }
+    #mensaje.ok { display: block; background: #e6f6ec; color: #17633a; }
+    #mensaje.error { display: block; background: #fdeaea; color: #8a1f1f; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Registro de estado de ánimo</h1>
+    <form id="formulario">
+      <label class="campo">
+        Nombre (ficticio)
+        <input type="text" id="nombre" name="nombre" value="Ana Pérez" required>
+      </label>
+
+      <fieldset>
+        <legend>Estado de ánimo</legend>
+        <div class="escala">
+          <label><input type="radio" name="estado_animo" value="1" required><br>1<small>Muy mal</small></label>
+          <label><input type="radio" name="estado_animo" value="2"><br>2<small>Mal</small></label>
+          <label><input type="radio" name="estado_animo" value="3"><br>3<small>Regular</small></label>
+          <label><input type="radio" name="estado_animo" value="4"><br>4<small>Bien</small></label>
+          <label><input type="radio" name="estado_animo" value="5"><br>5<small>Muy bien</small></label>
+        </div>
+      </fieldset>
+
+      <label class="campo">
+        Nota (opcional)
+        <textarea id="nota" name="nota" placeholder="Escribe cómo te sientes..."></textarea>
+      </label>
+
+      <button type="submit" class="boton-enviar" id="boton-enviar">Guardar</button>
+    </form>
+    <div id="mensaje" role="status"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://anqdtnswztrsnnfmdbor.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_rGSlgqlwMVXDT6e1086M8w_flAgSid7';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const formulario = document.getElementById('formulario');
+    const boton = document.getElementById('boton-enviar');
+    const mensaje = document.getElementById('mensaje');
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const estado = formulario.querySelector('input[name="estado_animo"]:checked');
+      const nota = document.getElementById('nota').value.trim();
+
+      if (!nombre || !estado) {
+        mostrar('Completa el nombre y el estado de ánimo.', 'error');
+        return;
+      }
+
+      boton.disabled = true;
+      boton.textContent = 'Guardando...';
+
+      const { error } = await supabase
+        .from('registros')
+        .insert({ nombre, estado_animo: Number(estado.value), nota: nota || null });
+
+      boton.disabled = false;
+      boton.textContent = 'Guardar';
+
+      if (error) {
+        mostrar('No se pudo guardar: ' + error.message, 'error');
+        return;
+      }
+
+      mostrar(`Registro guardado: ${nombre}, estado de ánimo ${estado.value}${nota ? ', con nota' : ''}.`, 'ok');
+      formulario.reset();
+      document.getElementById('nombre').value = 'Ana Pérez';
+    });
+
+    function mostrar(texto, tipo) {
+      mensaje.textContent = texto;
+      mensaje.className = tipo;
+    }
+  </script>
+</body>
+</html>
