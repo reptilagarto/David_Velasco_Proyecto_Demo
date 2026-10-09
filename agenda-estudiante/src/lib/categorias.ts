@@ -44,6 +44,6 @@ export const CATEGORIAS: Record<Categoria, InfoCategoria> = {
 
 export const PRIORIDADES = {
   alta: { etiqueta: "Alta", clase: "bg-destructive-soft text-destructive" },
-  media: { etiqueta: "Media", clase: "bg-laboral-soft text-laboral" },
+  media: { etiqueta: "Media", clase: "bg-primary-soft text-primary" },
   baja: { etiqueta: "Baja", clase: "bg-muted text-muted-foreground" },
 } as const;

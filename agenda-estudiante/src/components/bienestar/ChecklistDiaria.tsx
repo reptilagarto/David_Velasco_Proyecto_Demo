@@ -7,7 +7,7 @@ import { Check, Trophy } from "lucide-react";
 import { useAgenda } from "@/context/AgendaContext";
 import { cn } from "@/lib/utils";
 
-const COLORES_FESTEJO = ["#4e8a7f", "#d9894a", "#5b7fc7", "#5fa37b", "#e0b84a", "#c2574c"];
+const COLORES_FESTEJO = ["#1f5fb4", "#c8102e", "#6fa3e0", "#ffffff", "#0f2a4a", "#e4edfa"];
 
 interface Rafaga {
   id: number;

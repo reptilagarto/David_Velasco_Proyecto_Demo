@@ -2,29 +2,29 @@
 
 /* Tema claro por defecto: tonos suaves que transmiten orden y bienestar */
 :root {
-  --background: #f6f8f7;
-  --foreground: #1f2d2a;
+  --background: #f7f9fc;
+  --foreground: #0f2a4a;
   --card: #ffffff;
-  --card-foreground: #1f2d2a;
-  --muted: #edf2f0;
-  --muted-foreground: #5f6f6a;
-  --border: #dfe7e4;
-  --input: #d3ddd9;
-  --primary: #4e8a7f;
+  --card-foreground: #0f2a4a;
+  --muted: #eaf0f8;
+  --muted-foreground: #53657d;
+  --border: #d6e0ee;
+  --input: #bfcde0;
+  --primary: #1f5fb4;
   --primary-foreground: #ffffff;
-  --primary-soft: #e3f0ed;
-  --ring: #4e8a7f;
-  --destructive: #c2574c;
-  --destructive-soft: #fbe9e7;
+  --primary-soft: #e4edfa;
+  --ring: #1f5fb4;
+  --destructive: #c8102e;
+  --destructive-soft: #fde8eb;
   --radius: 0.875rem;
 
-  /* Categorías de la agenda */
-  --academica: #5b7fc7;
-  --academica-soft: #e8eefb;
-  --laboral: #d9894a;
-  --laboral-soft: #fbf0e4;
-  --personal: #5fa37b;
-  --personal-soft: #e6f4ec;
+  /* Categorías de la agenda: azul, rojo y azul claro */
+  --academica: #1f5fb4;
+  --academica-soft: #e4edfa;
+  --laboral: #c8102e;
+  --laboral-soft: #fde8eb;
+  --personal: #6fa3e0;
+  --personal-soft: #eaf3fd;
 }
 
 @theme inline {
