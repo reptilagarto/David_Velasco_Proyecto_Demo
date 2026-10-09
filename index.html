@@ -3,24 +3,386 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Harvey Aquini</title>
+  <title>Registro de actividades · Disponibilidad</title>
   <style>
-    body { font-family: Calibri, Arial, sans-serif; margin: 0; background: #f7fafc; color: #1f2d3d; text-align: center; padding: 80px 24px; }
-    h1 { color: #051c2c; font-size: 2.4rem; }
-    p { font-size: 1.2rem; }
-    .boton-comenzar { margin-top: 32px; padding: 14px 36px; font-size: 1.1rem; font-family: inherit; color: #ffffff; background: #1e6fd9; border: none; border-radius: 8px; cursor: pointer; }
-    .boton-comenzar:hover { background: #1858b0; }
+    body { font-family: Calibri, Arial, sans-serif; margin: 0; background: #f7fafc; color: #1f2d3d; padding: 48px 24px; }
+    main { max-width: 1000px; margin: 0 auto; }
+    h1 { color: #051c2c; font-size: 2rem; text-align: center; margin: 0 0 6px; }
+    .subtitulo { text-align: center; color: #5a6b7d; margin: 0 0 32px; }
+    .grid { display: grid; gap: 24px; grid-template-columns: 1fr; }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1fr 1.2fr; } }
+    section { background: #ffffff; padding: 24px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); }
+    h2 { color: #051c2c; font-size: 1.3rem; margin: 0 0 16px; }
+    label.campo { display: block; font-weight: bold; margin-bottom: 14px; }
+    input[type="text"], input[type="date"], input[type="time"], textarea { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; padding: 10px; font-size: 1rem; font-family: inherit; border: 1px solid #c4cdd6; border-radius: 6px; }
+    textarea { min-height: 70px; resize: vertical; }
+    .fila { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+    fieldset { border: none; padding: 0; margin: 0 0 14px; }
+    legend { font-weight: bold; margin-bottom: 8px; }
+    .tipos { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tipos label { flex: 1; text-align: center; padding: 10px 8px; border: 1px solid #c4cdd6; border-radius: 6px; cursor: pointer; background: #fff; }
+    .tipos input { margin-right: 4px; }
+    .boton { width: 100%; padding: 12px; font-size: 1.05rem; font-family: inherit; color: #ffffff; background: #1e6fd9; border: none; border-radius: 8px; cursor: pointer; }
+    .boton:hover { background: #1858b0; }
+    .boton:disabled { background: #8fb4e8; cursor: default; }
+    .boton-pequeno { width: auto; padding: 4px 10px; font-size: 0.85rem; background: #c0392b; }
+    .boton-pequeno:hover { background: #a93226; }
+    #mensaje { margin-top: 16px; padding: 12px; border-radius: 8px; display: none; }
+    #mensaje.ok { display: block; background: #e6f6ec; color: #17633a; }
+    #mensaje.error { display: block; background: #fdeaea; color: #8a1f1f; }
+    .buscador { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; margin-bottom: 16px; }
+    .buscador label { font-weight: bold; font-size: 0.9rem; }
+    .resumen { background: #f1f6fc; padding: 12px; border-radius: 6px; margin-bottom: 14px; line-height: 1.5; }
+    .linea { position: relative; height: 44px; background: #d9f2e3; border-radius: 8px; overflow: hidden; }
+    .bloque { position: absolute; top: 0; bottom: 0; }
+    .escala-horas { display: flex; justify-content: space-between; font-size: 0.75rem; color: #5a6b7d; margin: 4px 2px 18px; }
+    .leyenda { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; margin-bottom: 14px; }
+    .leyenda span::before { content: ''; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+    .leyenda .l-academica::before, .bloque.tipo-academica { background: #1e6fd9; }
+    .leyenda .l-laboral::before, .bloque.tipo-laboral { background: #7d3fc2; }
+    .leyenda .l-individual::before, .bloque.tipo-individual { background: #e08a00; }
+    .leyenda .l-libre::before { background: #d9f2e3; border: 1px solid #9fd4b3; }
+    ul { list-style: none; padding: 0; margin: 0; }
+    li.item { border: 1px solid #e3e9ef; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; }
+    .etiqueta { font-size: 0.75rem; font-weight: bold; color: #fff; padding: 2px 8px; border-radius: 10px; }
+    .etiqueta.tipo-academica { background: #1e6fd9; }
+    .etiqueta.tipo-laboral { background: #7d3fc2; }
+    .etiqueta.tipo-individual { background: #e08a00; }
+    .detalle { color: #5a6b7d; font-size: 0.9rem; grid-column: 1 / -1; }
+    .vacio { color: #5a6b7d; font-style: italic; }
+    .pie { text-align: center; margin-top: 28px; font-size: 0.9rem; }
+    .pie a { color: #1e6fd9; }
   </style>
 </head>
 <body>
-  <h1>David Velasco</h1>
-  <p>Hackathon de Salud Mental con IA · UCV</p>
-  <p>Pídele a Claude que cambie esta página.</p>
-  <p id="fecha-actual"></p>
-  <button class="boton-comenzar">Comenzar</button>
-  <button class="boton-comenzar">Primera hackaton con IA</button>
+  <main>
+    <h1>Registro de actividades</h1>
+    <p class="subtitulo">Académicas, laborales e individuales · identifica tu disponibilidad de tiempo</p>
+
+    <div class="grid">
+      <!-- Registro -->
+      <section>
+        <h2>Nueva actividad</h2>
+        <form id="formulario">
+          <label class="campo">
+            Nombre
+            <input type="text" id="nombre" name="nombre" placeholder="Ej.: Ana Pérez" required>
+          </label>
+
+          <fieldset>
+            <legend>Tipo de actividad</legend>
+            <div class="tipos">
+              <label><input type="radio" name="tipo" value="academica" required>Académica</label>
+              <label><input type="radio" name="tipo" value="laboral">Laboral</label>
+              <label><input type="radio" name="tipo" value="individual">Individual</label>
+            </div>
+          </fieldset>
+
+          <label class="campo">
+            Título
+            <input type="text" id="titulo" name="titulo" placeholder="Ej.: Clase de Estadística" required>
+          </label>
+
+          <label class="campo">
+            Fecha
+            <input type="date" id="fecha" name="fecha" required>
+          </label>
+
+          <div class="fila">
+            <label class="campo">
+              Hora de inicio
+              <input type="time" id="hora-inicio" name="hora_inicio" required>
+            </label>
+            <label class="campo">
+              Hora de fin
+              <input type="time" id="hora-fin" name="hora_fin" required>
+            </label>
+          </div>
+
+          <label class="campo">
+            Nota (opcional)
+            <textarea id="nota" name="nota" placeholder="Lugar, detalles..."></textarea>
+          </label>
+
+          <button type="submit" class="boton" id="boton-guardar">Guardar actividad</button>
+        </form>
+        <div id="mensaje" role="status"></div>
+      </section>
+
+      <!-- Disponibilidad -->
+      <section>
+        <h2>Disponibilidad</h2>
+        <form id="form-disponibilidad" class="buscador">
+          <label>
+            Persona
+            <input type="text" id="persona-disp" placeholder="Nombre exacto" >
+          </label>
+          <label>
+            Día
+            <input type="date" id="fecha-disp">
+          </label>
+        </form>
+
+        <div class="resumen" id="resumen">Escribe una persona y una fecha para ver su disponibilidad.</div>
+
+        <div class="leyenda">
+          <span class="l-libre">Libre</span>
+          <span class="l-academica">Académica</span>
+          <span class="l-laboral">Laboral</span>
+          <span class="l-individual">Individual</span>
+        </div>
+        <div class="linea" id="linea"></div>
+        <div class="escala-horas">
+          <span>07:00</span><span>10:00</span><span>13:00</span><span>16:00</span><span>19:00</span><span>22:00</span>
+        </div>
+
+        <h2 style="font-size:1.1rem">Actividades del día</h2>
+        <ul id="lista-dia"></ul>
+      </section>
+    </div>
+
+    <p class="pie"><a href="formulario.html">Ir al registro de estado de ánimo →</a></p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    document.getElementById('fecha-actual').textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const SUPABASE_URL = 'https://anqdtnswztrsnnfmdbor.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_rGSlgqlwMVXDT6e1086M8w_flAgSid7';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Ventana horaria que se usa para calcular la disponibilidad (07:00 – 22:00)
+    const VENTANA_INICIO = 7 * 60;
+    const VENTANA_FIN = 22 * 60;
+    const NOMBRES_TIPO = { academica: 'Académica', laboral: 'Laboral', individual: 'Individual' };
+
+    const formulario = document.getElementById('formulario');
+    const boton = document.getElementById('boton-guardar');
+    const mensaje = document.getElementById('mensaje');
+    const formDisponibilidad = document.getElementById('form-disponibilidad');
+    const inputPersona = document.getElementById('persona-disp');
+    const inputFechaDisp = document.getElementById('fecha-disp');
+    const resumen = document.getElementById('resumen');
+    const linea = document.getElementById('linea');
+    const listaDia = document.getElementById('lista-dia');
+
+    document.getElementById('fecha').value = hoyISO();
+    inputFechaDisp.value = hoyISO();
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      const nombre = valor('nombre');
+      const tipo = formulario.querySelector('input[name="tipo"]:checked')?.value;
+      const titulo = valor('titulo');
+      const fecha = valor('fecha');
+      const inicio = valor('hora-inicio');
+      const fin = valor('hora-fin');
+      const nota = valor('nota');
+
+      if (!nombre || !tipo || !titulo || !fecha || !inicio || !fin) {
+        mostrar('Completa los campos obligatorios.', 'error');
+        return;
+      }
+      if (aMinutos(fin) <= aMinutos(inicio)) {
+        mostrar('La hora de fin debe ser posterior a la de inicio.', 'error');
+        return;
+      }
+
+      boton.disabled = true;
+      boton.textContent = 'Guardando...';
+
+      try {
+        // Evita choques de horario para la misma persona y día
+        const existentes = await cargarDia(nombre, fecha);
+        const choque = existentes.find((a) =>
+          aMinutos(a.hora_inicio) < aMinutos(fin) && aMinutos(a.hora_fin) > aMinutos(inicio)
+        );
+        if (choque) {
+          mostrar(`Se cruza con "${choque.titulo}" (${corta(choque.hora_inicio)}–${corta(choque.hora_fin)}).`, 'error');
+          return;
+        }
+
+        const { error } = await supabase.from('actividades').insert({
+          nombre, tipo, titulo, fecha,
+          hora_inicio: inicio,
+          hora_fin: fin,
+          nota: nota || null
+        });
+        if (error) throw error;
+
+        mostrar(`Actividad guardada para ${nombre} el ${fecha}.`, 'ok');
+        formulario.reset();
+        document.getElementById('fecha').value = fecha;
+        inputPersona.value = nombre;
+        inputFechaDisp.value = fecha;
+        await actualizarDisponibilidad();
+      } catch (err) {
+        mostrar('No se pudo guardar: ' + err.message, 'error');
+      } finally {
+        boton.disabled = false;
+        boton.textContent = 'Guardar actividad';
+      }
+    });
+
+    formDisponibilidad.addEventListener('submit', (e) => {
+      e.preventDefault();
+      actualizarDisponibilidad();
+    });
+    inputPersona.addEventListener('change', actualizarDisponibilidad);
+    inputFechaDisp.addEventListener('change', actualizarDisponibilidad);
+
+    listaDia.addEventListener('click', async (e) => {
+      const id = e.target.dataset.id;
+      if (!id || !confirm('¿Eliminar esta actividad?')) return;
+      const { error } = await supabase.from('actividades').delete().eq('id', id);
+      if (error) {
+        mostrar('No se pudo eliminar: ' + error.message, 'error');
+        return;
+      }
+      actualizarDisponibilidad();
+    });
+
+    async function actualizarDisponibilidad() {
+      const persona = inputPersona.value.trim();
+      const fecha = inputFechaDisp.value;
+
+      if (!persona || !fecha) {
+        resumen.textContent = 'Escribe una persona y una fecha para ver su disponibilidad.';
+        linea.innerHTML = '';
+        listaDia.innerHTML = '';
+        return;
+      }
+
+      try {
+        const actividades = await cargarDia(persona, fecha);
+        renderResumen(actividades);
+        renderLinea(actividades);
+        renderLista(actividades);
+      } catch (err) {
+        resumen.textContent = 'No se pudo cargar: ' + err.message;
+      }
+    }
+
+    async function cargarDia(nombre, fecha) {
+      const { data, error } = await supabase
+        .from('actividades')
+        .select('*')
+        .eq('nombre', nombre)
+        .eq('fecha', fecha)
+        .order('hora_inicio', { ascending: true });
+      if (error) throw error;
+      return data;
+    }
+
+    function calcularLibres(actividades) {
+      const ocupados = actividades
+        .map((a) => [aMinutos(a.hora_inicio), aMinutos(a.hora_fin)])
+        .sort((a, b) => a[0] - b[0]);
+
+      const libres = [];
+      let cursor = VENTANA_INICIO;
+      for (const [inicio, fin] of ocupados) {
+        if (inicio > cursor) libres.push([cursor, Math.min(inicio, VENTANA_FIN)]);
+        cursor = Math.max(cursor, fin);
+        if (cursor >= VENTANA_FIN) break;
+      }
+      if (cursor < VENTANA_FIN) libres.push([cursor, VENTANA_FIN]);
+      return libres.filter(([a, b]) => b > a);
+    }
+
+    function renderResumen(actividades) {
+      const libres = calcularLibres(actividades);
+      const minutosLibres = libres.reduce((total, [a, b]) => total + (b - a), 0);
+
+      if (libres.length === 0) {
+        resumen.textContent = 'Sin tiempo libre entre 07:00 y 22:00.';
+        return;
+      }
+      resumen.innerHTML =
+        `<strong>Horas libres:</strong> ${(minutosLibres / 60).toFixed(1)} h<br>` +
+        libres.map(([a, b]) => `${aHora(a)}–${aHora(b)}`).join(' · ');
+    }
+
+    function renderLinea(actividades) {
+      linea.innerHTML = '';
+      const rango = VENTANA_FIN - VENTANA_INICIO;
+      for (const a of actividades) {
+        const inicio = Math.max(aMinutos(a.hora_inicio), VENTANA_INICIO);
+        const fin = Math.min(aMinutos(a.hora_fin), VENTANA_FIN);
+        if (fin <= inicio) continue;
+
+        const bloque = document.createElement('div');
+        bloque.className = 'bloque tipo-' + a.tipo;
+        bloque.style.left = ((inicio - VENTANA_INICIO) / rango * 100) + '%';
+        bloque.style.width = ((fin - inicio) / rango * 100) + '%';
+        bloque.title = `${a.titulo} (${corta(a.hora_inicio)}–${corta(a.hora_fin)})`;
+        linea.appendChild(bloque);
+      }
+    }
+
+    function renderLista(actividades) {
+      listaDia.innerHTML = '';
+      if (actividades.length === 0) {
+        const vacio = document.createElement('li');
+        vacio.className = 'vacio';
+        vacio.textContent = 'Sin actividades registradas este día.';
+        listaDia.appendChild(vacio);
+        return;
+      }
+
+      for (const a of actividades) {
+        const item = document.createElement('li');
+        item.className = 'item';
+
+        const titulo = document.createElement('strong');
+        titulo.textContent = a.titulo;
+
+        const etiqueta = document.createElement('span');
+        etiqueta.className = 'etiqueta tipo-' + a.tipo;
+        etiqueta.textContent = NOMBRES_TIPO[a.tipo] || a.tipo;
+
+        const detalle = document.createElement('div');
+        detalle.className = 'detalle';
+        detalle.textContent = `${corta(a.hora_inicio)}–${corta(a.hora_fin)}` + (a.nota ? ` · ${a.nota}` : '');
+
+        const borrar = document.createElement('button');
+        borrar.className = 'boton boton-pequeno';
+        borrar.dataset.id = a.id;
+        borrar.textContent = 'Eliminar';
+
+        const fila = document.createElement('div');
+        fila.append(titulo);
+        item.append(fila, etiqueta, detalle, borrar);
+        listaDia.appendChild(item);
+      }
+    }
+
+    function mostrar(texto, tipo) {
+      mensaje.textContent = texto;
+      mensaje.className = tipo;
+    }
+
+    function valor(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function hoyISO() {
+      const d = new Date();
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    }
+
+    function aMinutos(hora) {
+      const [h, m] = hora.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function aHora(minutos) {
+      return String(Math.floor(minutos / 60)).padStart(2, '0') + ':' + String(minutos % 60).padStart(2, '0');
+    }
+
+    function corta(hora) {
+      return hora.slice(0, 5);
+    }
   </script>
 </body>
 </html>
