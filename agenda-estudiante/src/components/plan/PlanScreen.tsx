@@ -3,6 +3,8 @@
 import { AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
 
+import { PageHeader } from "@/components/ui/PageHeader";
+
 import { useAgenda } from "@/context/AgendaContext";
 import { IndicadoresProgreso } from "@/components/plan/IndicadoresProgreso";
 import { TarjetaAlerta } from "@/components/plan/TarjetaAlerta";
@@ -14,10 +16,7 @@ export function PlanScreen() {
 
   return (
     <div className="space-y-6">
-      <section className="pt-2">
-        <h2 className="text-xl font-semibold tracking-tight">Plan de estudio</h2>
-        <p className="text-sm text-muted-foreground">Adaptado a tus turnos y clases de esta semana.</p>
-      </section>
+      <PageHeader eyebrow="Estudio" titulo="Plan de estudio" descripcion="Adaptado a tus turnos y clases de esta semana." />
 
       <IndicadoresProgreso />
 

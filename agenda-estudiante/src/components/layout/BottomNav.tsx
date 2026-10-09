@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const ENLACES: { href: string; etiqueta: string; icono: LucideIcon }[] = [
   { href: "/captura", etiqueta: "Registro", icono: PencilLine },
-  { href: "/calendario", etiqueta: "Agenda", icono: CalendarDays },
+  { href: "/calendario", etiqueta: "Calendario", icono: CalendarDays },
   { href: "/plan", etiqueta: "Plan", icono: ListChecks },
   { href: "/bienestar", etiqueta: "Bienestar", icono: HeartPulse },
 ];
@@ -20,7 +20,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-2xl border-t border-border bg-card/95 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-md"
+      className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-2xl rounded-2xl border border-border bg-card/95 p-1.5 shadow-lg backdrop-blur-md"
     >
       <ul className="grid grid-cols-4 gap-1">
         {ENLACES.map(({ href, etiqueta, icono: Icono }) => {
@@ -31,19 +31,19 @@ export function BottomNav() {
                 href={href}
                 aria-current={activo ? "page" : undefined}
                 className={cn(
-                  "relative flex flex-col items-center gap-1 rounded-lg py-1.5 text-xs font-medium transition-colors",
+                  "relative flex flex-col items-center gap-0.5 rounded-xl py-2 text-[11px] font-semibold transition-colors",
                   activo ? "text-primary" : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {activo && (
                   <motion.span
-                    layoutId="indicador-nav"
-                    className="absolute inset-x-3 -top-2 h-1 rounded-full bg-primary"
+                    layoutId="pastilla-nav"
+                    className="absolute inset-0 rounded-xl bg-primary-soft"
                     transition={{ type: "spring", stiffness: 420, damping: 34 }}
                   />
                 )}
-                <Icono className="size-5" aria-hidden />
-                {etiqueta}
+                <Icono className="relative size-5" aria-hidden />
+                <span className="relative">{etiqueta}</span>
               </Link>
             </li>
           );

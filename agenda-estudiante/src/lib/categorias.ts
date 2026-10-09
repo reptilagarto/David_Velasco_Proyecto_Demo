@@ -1,17 +1,20 @@
 import { Briefcase, GraduationCap, User, type LucideIcon } from "lucide-react";
 
-import type { Categoria } from "@/types";
+import type { Categoria, Prioridad } from "@/types";
 
+/** Clases literales para que Tailwind las detecte. */
 export interface InfoCategoria {
   etiqueta: string;
   icono: LucideIcon;
-  /** Clases para bloques de la agenda (fondo suave + borde de acento). */
-  bloque: string;
-  /** Color de acento para bordes laterales. */
+  /** Fondo suave para tarjetas y selectores activos. */
+  soft: string;
+  /** Color de texto para iconos y etiquetas. */
+  texto: string;
+  /** Borde lateral de acento. */
   acento: string;
-  /** Color sólido para puntos e indicadores. */
+  /** Color sólido para puntos y barras. */
   punto: string;
-  /** Clases de la insignia. */
+  /** Variante de insignia. */
   insignia: "academica" | "laboral" | "personal";
 }
 
@@ -19,7 +22,8 @@ export const CATEGORIAS: Record<Categoria, InfoCategoria> = {
   academica: {
     etiqueta: "Académica",
     icono: GraduationCap,
-    bloque: "bg-academica-soft border-academica text-foreground",
+    soft: "bg-academica-soft",
+    texto: "text-academica",
     acento: "border-academica",
     punto: "bg-academica",
     insignia: "academica",
@@ -27,7 +31,8 @@ export const CATEGORIAS: Record<Categoria, InfoCategoria> = {
   laboral: {
     etiqueta: "Laboral",
     icono: Briefcase,
-    bloque: "bg-laboral-soft border-laboral text-foreground",
+    soft: "bg-laboral-soft",
+    texto: "text-laboral",
     acento: "border-laboral",
     punto: "bg-laboral",
     insignia: "laboral",
@@ -35,15 +40,16 @@ export const CATEGORIAS: Record<Categoria, InfoCategoria> = {
   personal: {
     etiqueta: "Personal",
     icono: User,
-    bloque: "bg-personal-soft border-personal text-foreground",
+    soft: "bg-personal-soft",
+    texto: "text-personal",
     acento: "border-personal",
     punto: "bg-personal",
     insignia: "personal",
   },
 };
 
-export const PRIORIDADES = {
+export const PRIORIDADES: Record<Prioridad, { etiqueta: string; clase: string }> = {
   alta: { etiqueta: "Alta", clase: "bg-destructive-soft text-destructive" },
   media: { etiqueta: "Media", clase: "bg-primary-soft text-primary" },
   baja: { etiqueta: "Baja", clase: "bg-muted text-muted-foreground" },
-} as const;
+};

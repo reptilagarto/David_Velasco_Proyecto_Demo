@@ -2,15 +2,12 @@
 
 import { CalendarioMes } from "@/components/calendario/CalendarioMes";
 import { DetalleDia } from "@/components/calendario/DetalleDia";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export function CalendarioScreen() {
   return (
-    <div className="space-y-6">
-      <section className="pt-2">
-        <h2 className="text-xl font-semibold tracking-tight">Calendario</h2>
-        <p className="text-sm text-muted-foreground">Toca un día para ver sus actividades y entregas.</p>
-      </section>
-
+    <div className="space-y-5">
+      <PageHeader eyebrow="Agenda" titulo="Calendario" descripcion="Toca un día para ver su detalle." />
       <CalendarioMes />
       <DetalleDia />
     </div>

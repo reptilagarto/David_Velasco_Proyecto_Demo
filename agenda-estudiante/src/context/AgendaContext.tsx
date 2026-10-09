@@ -9,7 +9,7 @@ import {
   HABITOS_INICIALES,
   TAREAS_INICIALES,
 } from "@/data/mockData";
-import type { Actividad, Alerta, Categoria, Habito, Prioridad, Tarea } from "@/types";
+import type { Actividad, Categoria, Prioridad } from "@/types";
 import { aFilaActividad, cargarAgenda, type DatosAgenda } from "@/lib/agendaRepo";
 import { supabase } from "@/lib/supabase";
 import type { Hueco } from "@/lib/time";
@@ -267,8 +267,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
       dispatch({ type: "reorganizarAlerta", id });
       if (alerta)
         persistir(
-          supabase!
-            .from("alertas")
+          supabase?.from("alertas")
             .update({ indice: (alerta.indice + 1) % alerta.opciones.length, reorganizada: true })
             .eq("id", id),
         );

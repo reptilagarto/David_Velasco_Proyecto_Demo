@@ -33,7 +33,7 @@ export function CalendarioMes() {
   const celdas = cuadriculaMes(mesVisto.anio, mesVisto.mes);
 
   return (
-    <section aria-labelledby="titulo-mes" className="rounded-lg border border-border bg-card p-3 shadow-sm sm:p-4">
+    <section aria-labelledby="titulo-mes" className="rounded-2xl bg-card p-3 shadow-sm ring-1 ring-border sm:p-4">
       <div className="mb-3 flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={() => cambiarMes(-1)} aria-label="Mes anterior">
           <ChevronLeft aria-hidden />

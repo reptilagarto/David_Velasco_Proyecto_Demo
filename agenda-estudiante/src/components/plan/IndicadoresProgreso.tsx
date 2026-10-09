@@ -21,7 +21,7 @@ export function IndicadoresProgreso() {
 
   return (
     <div className="grid gap-4">
-      <Card>
+      <Card className="rounded-2xl shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <CheckCircle2 className="size-4 text-primary" aria-hidden />
