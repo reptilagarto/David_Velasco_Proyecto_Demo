@@ -39,7 +39,7 @@ export function DetalleDia() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-primary">
             {esHoy ? "Hoy" : "Día seleccionado"}
           </p>
-          <h3 className="text-xl font-bold capitalize tracking-tight">{formatoFechaLarga(fechaSeleccionada)}</h3>
+          <h3 className="text-xl font-bold tracking-tight">{formatoFechaLarga(fechaSeleccionada)}</h3>
         </div>
 
         <div className="grid grid-cols-3 gap-2">

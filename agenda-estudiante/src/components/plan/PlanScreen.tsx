@@ -15,9 +15,10 @@ export function PlanScreen() {
   const pendientes = alertas.filter((a) => a.estado === "pendiente").length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 lg:space-y-8">
       <PageHeader eyebrow="Estudio" titulo="Plan de estudio" descripcion="Adaptado a tus turnos y clases de esta semana." />
 
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start lg:gap-8">
       <IndicadoresProgreso />
 
       <section aria-labelledby="titulo-alertas" className="space-y-3">
@@ -36,6 +37,8 @@ export function PlanScreen() {
           </AnimatePresence>
         </div>
       </section>
+
+      </div>
 
       <section aria-labelledby="titulo-tareas" className="space-y-3">
         <h3 id="titulo-tareas" className="text-base font-semibold">

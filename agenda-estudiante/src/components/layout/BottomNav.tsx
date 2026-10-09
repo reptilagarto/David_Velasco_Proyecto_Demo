@@ -3,27 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { CalendarDays, HeartPulse, ListChecks, PencilLine, type LucideIcon } from "lucide-react";
 
+import { ENLACES_NAVEGACION } from "@/lib/navegacion";
 import { cn } from "@/lib/utils";
 
-const ENLACES: { href: string; etiqueta: string; icono: LucideIcon }[] = [
-  { href: "/captura", etiqueta: "Registro", icono: PencilLine },
-  { href: "/calendario", etiqueta: "Calendario", icono: CalendarDays },
-  { href: "/plan", etiqueta: "Plan", icono: ListChecks },
-  { href: "/bienestar", etiqueta: "Bienestar", icono: HeartPulse },
-];
-
+/** Barra inferior para celular y tableta. En escritorio se oculta y aparece la lateral. */
 export function BottomNav() {
   const ruta = usePathname();
 
   return (
     <nav
-      aria-label="Navegación principal"
-      className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-2xl rounded-2xl border border-border bg-card/95 p-1.5 shadow-lg backdrop-blur-md"
+      aria-label="Navegación inferior"
+      className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-2xl rounded-2xl border border-border bg-card/95 p-1.5 shadow-lg backdrop-blur-md lg:hidden"
     >
       <ul className="grid grid-cols-4 gap-1">
-        {ENLACES.map(({ href, etiqueta, icono: Icono }) => {
+        {ENLACES_NAVEGACION.map(({ href, etiqueta, icono: Icono }) => {
           const activo = ruta === href;
           return (
             <li key={href}>

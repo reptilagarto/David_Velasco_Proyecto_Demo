@@ -15,7 +15,7 @@ const ICONOS: Record<CategoriaHabito, LucideIcon> = {
 
 export function RecomendacionesHabitos() {
   return (
-    <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
       {RECOMENDACIONES_INICIALES.map((r) => {
         const Icono = ICONOS[r.categoria];
         return (

@@ -15,7 +15,7 @@ export function ListaTareas() {
   const ordenadas = [...tareas].sort((a, b) => Number(a.completada) - Number(b.completada));
 
   return (
-    <ul className="space-y-2.5">
+    <ul className="grid grid-cols-1 gap-2.5 lg:grid-cols-2">
       <AnimatePresence initial={false}>
         {ordenadas.map((t) => {
           const asignatura = ASIGNATURAS.find((a) => a.id === t.asignaturaId);

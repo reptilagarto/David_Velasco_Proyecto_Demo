@@ -5,7 +5,7 @@ import { RecursosApoyo } from "@/components/bienestar/RecursosApoyo";
 
 export function BienestarScreen() {
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 lg:space-y-9">
       <PageHeader eyebrow="Bienestar" titulo="Hábitos saludables" descripcion="Pequeñas pausas que hacen una gran diferencia." />
       <section aria-labelledby="titulo-recomendaciones" className="space-y-3">
         <h3 id="titulo-recomendaciones" className="text-base font-bold">
@@ -14,6 +14,7 @@ export function BienestarScreen() {
         <RecomendacionesHabitos />
       </section>
 
+      <div className="grid grid-cols-1 gap-7 lg:grid-cols-2 lg:items-start lg:gap-8">
       <section aria-labelledby="titulo-checklist" className="space-y-3">
         <h3 id="titulo-checklist" className="text-base font-bold">
           Mi lista de hoy
@@ -27,6 +28,7 @@ export function BienestarScreen() {
         </h3>
         <RecursosApoyo />
       </section>
+      </div>
     </div>
   );
 }
