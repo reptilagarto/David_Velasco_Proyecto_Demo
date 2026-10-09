@@ -105,3 +105,30 @@ export function formatoFechaCorta(iso: string): string {
   const f = aFecha(iso);
   return `${DIAS[f.getDay()].slice(0, 3)} ${f.getDate()} ${MESES_CORTOS[f.getMonth()]}`;
 }
+
+export interface CeldaMes {
+  fecha: string;
+  dentroDelMes: boolean;
+}
+
+const MESES_LARGOS = [
+  "enero", "febrero", "marzo", "abril", "mayo", "junio",
+  "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+];
+
+/** "octubre 2026" para el encabezado del calendario (anio y mes con mes base 0). */
+export function nombreMes(anio: number, mes: number): string {
+  const texto = `${MESES_LARGOS[mes]} ${anio}`;
+  return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+/** Cuadrícula de 6 semanas (lunes primero) que cubre el mes indicado. */
+export function cuadriculaMes(anio: number, mes: number): CeldaMes[] {
+  const primero = new Date(anio, mes, 1, 12);
+  const offset = (primero.getDay() + 6) % 7; // días previos desde el lunes
+  return Array.from({ length: 42 }, (_, i) => {
+    const d = new Date(anio, mes, 1 - offset + i, 12);
+    const fecha = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return { fecha, dentroDelMes: d.getMonth() === mes };
+  });
+}
