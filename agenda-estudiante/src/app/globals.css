@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/* Tema claro por defecto: tonos suaves que transmiten orden y bienestar */
+:root {
+  --background: #f6f8f7;
+  --foreground: #1f2d2a;
+  --card: #ffffff;
+  --card-foreground: #1f2d2a;
+  --muted: #edf2f0;
+  --muted-foreground: #5f6f6a;
+  --border: #dfe7e4;
+  --input: #d3ddd9;
+  --primary: #4e8a7f;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e3f0ed;
+  --ring: #4e8a7f;
+  --destructive: #c2574c;
+  --destructive-soft: #fbe9e7;
+  --radius: 0.875rem;
+
+  /* Categorías de la agenda */
+  --academica: #5b7fc7;
+  --academica-soft: #e8eefb;
+  --laboral: #d9894a;
+  --laboral-soft: #fbf0e4;
+  --personal: #5fa37b;
+  --personal-soft: #e6f4ec;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-academica: var(--academica);
+  --color-academica-soft: var(--academica-soft);
+  --color-laboral: var(--laboral);
+  --color-laboral-soft: var(--laboral-soft);
+  --color-personal: var(--personal);
+  --color-personal-soft: var(--personal-soft);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Accesibilidad: respetar a quien prefiere menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
