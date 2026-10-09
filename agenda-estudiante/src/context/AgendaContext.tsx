@@ -10,6 +10,8 @@ import {
   TAREAS_INICIALES,
 } from "@/data/mockData";
 import type { Actividad, Alerta, Categoria, Habito, Prioridad, Tarea } from "@/types";
+import { aFilaActividad, cargarAgenda, type DatosAgenda } from "@/lib/agendaRepo";
+import { supabase } from "@/lib/supabase";
 import type { Hueco } from "@/lib/time";
 import { aMinutos, aHora } from "@/lib/time";
 
@@ -22,16 +24,13 @@ export interface Aviso {
   texto: string;
 }
 
-export interface EstadoAgenda {
-  actividades: Actividad[];
-  tareas: Tarea[];
-  alertas: Alerta[];
-  habitos: Habito[];
+export interface EstadoAgenda extends DatosAgenda {
   fechaSeleccionada: string;
   avisos: Aviso[];
 }
 
 type Accion =
+  | { type: "cargar"; datos: DatosAgenda }
   | { type: "agregarActividad"; actividad: Actividad }
   | { type: "eliminarActividad"; id: string }
   | { type: "seleccionarFecha"; fecha: string }
@@ -55,6 +54,9 @@ const ESTADO_INICIAL: EstadoAgenda = {
 
 function reducer(estado: EstadoAgenda, accion: Accion): EstadoAgenda {
   switch (accion.type) {
+    case "cargar":
+      return { ...estado, ...accion.datos };
+
     case "agregarActividad":
       return { ...estado, actividades: [...estado.actividades, accion.actividad] };
 
@@ -132,6 +134,8 @@ export interface NuevaActividad {
 }
 
 export interface AgendaContextValue extends EstadoAgenda {
+  /** true cuando los datos vienen de Supabase; false si se usan los simulados. */
+  conectadoBD: boolean;
   agregarActividad: (datos: NuevaActividad) => void;
   eliminarActividad: (id: string) => void;
   seleccionarFecha: (fecha: string) => void;
@@ -155,6 +159,7 @@ function nuevoId(prefijo: string) {
 
 export function AgendaProvider({ children }: { children: React.ReactNode }) {
   const [estado, dispatch] = React.useReducer(reducer, ESTADO_INICIAL);
+  const conectadoBD = supabase !== null;
 
   const notificar = React.useCallback((texto: string) => {
     const id = Date.now() + Math.random();
@@ -162,32 +167,76 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
     window.setTimeout(() => dispatch({ type: "quitarAviso", id }), 2600);
   }, []);
 
-  const agregarActividad = React.useCallback(
-    (datos: NuevaActividad) => {
-      dispatch({ type: "agregarActividad", actividad: { id: nuevoId("act"), ...datos } });
-      notificar("Actividad guardada");
+  /** Ejecuta una escritura en Supabase sin bloquear la interfaz; avisa si falla. */
+  const persistir = React.useCallback(
+    (operacion: PromiseLike<{ error: { message: string } | null }> | undefined) => {
+      // Sin Supabase la operación es undefined y no se hace nada.
+      if (!operacion) return;
+      Promise.resolve(operacion).then(({ error }) => {
+        if (error) notificar("No se pudo guardar: " + error.message);
+      });
     },
     [notificar],
   );
 
-  const eliminarActividad = React.useCallback((id: string) => {
-    dispatch({ type: "eliminarActividad", id });
-  }, []);
+  // Carga inicial desde Supabase. Si falla, la app sigue con los datos simulados.
+  React.useEffect(() => {
+    if (!supabase) return;
+    let vigente = true;
+    cargarAgenda(supabase)
+      .then((datos) => {
+        if (vigente && datos) dispatch({ type: "cargar", datos });
+      })
+      .catch((error: { message?: string }) => {
+        if (vigente) notificar("Sin conexión a la base de datos: " + (error.message ?? "error desconocido"));
+      });
+    return () => {
+      vigente = false;
+    };
+  }, [notificar]);
+
+  const agregarActividad = React.useCallback(
+    (datos: NuevaActividad) => {
+      const actividad: Actividad = { id: nuevoId("act"), ...datos };
+      dispatch({ type: "agregarActividad", actividad });
+      persistir(supabase?.from("actividades").insert(aFilaActividad(actividad)));
+      notificar("Actividad guardada");
+    },
+    [notificar, persistir],
+  );
+
+  const eliminarActividad = React.useCallback(
+    (id: string) => {
+      dispatch({ type: "eliminarActividad", id });
+      persistir(supabase?.from("actividades").delete().eq("id", id));
+    },
+    [persistir],
+  );
 
   const seleccionarFecha = React.useCallback((fecha: string) => {
     dispatch({ type: "seleccionarFecha", fecha });
   }, []);
 
-  const alternarTarea = React.useCallback((id: string) => {
-    dispatch({ type: "alternarTarea", id });
-  }, []);
+  const alternarTarea = React.useCallback(
+    (id: string) => {
+      const tarea = estado.tareas.find((t) => t.id === id);
+      dispatch({ type: "alternarTarea", id });
+      if (tarea) persistir(supabase?.from("tareas").update({ completada: !tarea.completada }).eq("id", id));
+    },
+    [estado.tareas, persistir],
+  );
 
   const registrarTiempo = React.useCallback(
     (id: string, minutos: number) => {
+      const tarea = estado.tareas.find((t) => t.id === id);
       dispatch({ type: "registrarTiempo", id, minutos });
+      if (tarea)
+        persistir(
+          supabase?.from("tareas").update({ minutos_reales: tarea.minutosReales + minutos }).eq("id", id),
+        );
       notificar(`+${minutos} min registrados`);
     },
-    [notificar],
+    [estado.tareas, notificar, persistir],
   );
 
   const aceptarAlerta = React.useCallback(
@@ -205,30 +254,46 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
         prioridad: alerta.prioridad,
       };
       dispatch({ type: "aceptarAlerta", id, actividad });
+      persistir(supabase?.from("actividades").insert(aFilaActividad(actividad)));
+      persistir(supabase?.from("alertas").update({ estado: "aceptada" }).eq("id", id));
       notificar("Sugerencia añadida a tu calendario");
     },
-    [estado.alertas, notificar],
+    [estado.alertas, notificar, persistir],
   );
 
   const reorganizarAlerta = React.useCallback(
     (id: string) => {
+      const alerta = estado.alertas.find((a) => a.id === id);
       dispatch({ type: "reorganizarAlerta", id });
+      if (alerta)
+        persistir(
+          supabase!
+            .from("alertas")
+            .update({ indice: (alerta.indice + 1) % alerta.opciones.length, reorganizada: true })
+            .eq("id", id),
+        );
       notificar("Propuesta reorganizada");
     },
-    [notificar],
+    [estado.alertas, notificar, persistir],
   );
 
   const rechazarAlerta = React.useCallback(
     (id: string) => {
       dispatch({ type: "rechazarAlerta", id });
+      persistir(supabase?.from("alertas").update({ estado: "rechazada" }).eq("id", id));
       notificar("Sugerencia descartada");
     },
-    [notificar],
+    [notificar, persistir],
   );
 
-  const alternarHabito = React.useCallback((id: string) => {
-    dispatch({ type: "alternarHabito", id });
-  }, []);
+  const alternarHabito = React.useCallback(
+    (id: string) => {
+      const habito = estado.habitos.find((h) => h.id === id);
+      dispatch({ type: "alternarHabito", id });
+      if (habito) persistir(supabase?.from("habitos").update({ completado: !habito.completado }).eq("id", id));
+    },
+    [estado.habitos, persistir],
+  );
 
   const reservarHueco = React.useCallback(
     (hueco: Hueco, tipo: "estudio" | "descanso") => {
@@ -246,14 +311,16 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
         reservada: true,
       };
       dispatch({ type: "agregarActividad", actividad });
+      persistir(supabase?.from("actividades").insert(aFilaActividad(actividad)));
       notificar(tipo === "estudio" ? "Sesión de estudio reservada" : "Descanso reservado");
     },
-    [estado.fechaSeleccionada, notificar],
+    [estado.fechaSeleccionada, notificar, persistir],
   );
 
   const valor = React.useMemo<AgendaContextValue>(
     () => ({
       ...estado,
+      conectadoBD,
       agregarActividad,
       eliminarActividad,
       seleccionarFecha,
@@ -268,6 +335,7 @@ export function AgendaProvider({ children }: { children: React.ReactNode }) {
     }),
     [
       estado,
+      conectadoBD,
       agregarActividad,
       eliminarActividad,
       seleccionarFecha,
