@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi tiempo · Gestión del tiempo y hábitos saludables</title>
+  <style>
+    :root {
+      --jade: #00a88e;
+      --jade-oscuro: #00795f;
+      --azul: #1e6bff;
+      --azul-oscuro: #0b3fb8;
+      --crema: #fff6e3;
+      --texto: #0f2a2e;
+      --texto-suave: #5b6b6e;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      position: relative;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      overflow-x: hidden;
+      font-family: Calibri, Arial, sans-serif;
+      color: var(--texto);
+      background: linear-gradient(135deg, var(--jade) 0%, var(--azul) 100%);
+      background-size: 200% 200%;
+      animation: fondo 14s ease infinite;
+    }
+
+    /* Iconos decorativos flotando de fondo */
+    svg.flotante {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      color: var(--crema);
+      opacity: 0.22;
+      animation: flotar 7s ease-in-out infinite;
+      pointer-events: none;
+    }
+    svg.flotante:nth-of-type(2n) { animation-duration: 9s; }
+    svg.flotante:nth-of-type(3n) { animation-duration: 11s; width: 48px; height: 48px; }
+
+    .icono {
+      width: 1em;
+      height: 1em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* Cabecera */
+    .cabecera {
+      text-align: center;
+      color: var(--crema);
+      max-width: 520px;
+      margin-bottom: 28px;
+      animation: subir 0.8s ease both;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 84px;
+      height: 84px;
+      margin-bottom: 14px;
+      border-radius: 50%;
+      background: var(--crema);
+      color: var(--jade-oscuro);
+      font-size: 42px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+      animation: latido 3s ease-in-out infinite;
+    }
+    .cabecera h1 { margin: 0 0 8px; font-size: 2.4rem; line-height: 1.1; }
+    .cabecera p { margin: 0 0 18px; font-size: 1.08rem; opacity: 0.95; }
+
+    .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 246, 227, 0.18);
+      border: 1px solid rgba(255, 246, 227, 0.35);
+      font-size: 0.9rem;
+    }
+
+    /* Tarjeta de acceso */
+    .tarjeta {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px 28px 26px;
+      background: var(--crema);
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+      animation: subir 0.8s 0.15s ease both;
+    }
+
+    .pestanas {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 22px;
+      padding: 4px;
+      background: rgba(11, 63, 184, 0.08);
+      border-radius: 999px;
+    }
+    .pestana {
+      position: relative;
+      z-index: 1;
+      padding: 10px 0;
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-weight: bold;
+      color: var(--texto-suave);
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .pestana.activa { color: #ffffff; }
+    .indicador {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--jade), var(--azul));
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .pestanas[data-modo="registro"] .indicador { transform: translateX(100%); }
+
+    h2 { margin: 0 0 4px; font-size: 1.4rem; }
+    .subtitulo { margin: 0 0 18px; font-size: 0.95rem; color: var(--texto-suave); }
+
+    form { display: flex; flex-direction: column; gap: 14px; }
+    .campo { display: flex; flex-direction: column; gap: 6px; font-weight: bold; font-size: 0.95rem; }
+    .campo-entrada {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .campo-entrada > .icono {
+      position: absolute;
+      left: 12px;
+      color: var(--azul);
+      pointer-events: none;
+    }
+    .campo input {
+      width: 100%;
+      padding: 12px 40px 12px 40px;
+      font: inherit;
+      font-weight: normal;
+      color: var(--texto);
+      background: #ffffff;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .campo input:focus {
+      outline: none;
+      border-color: var(--azul);
+      box-shadow: 0 0 0 4px rgba(30, 107, 255, 0.18);
+    }
+    .campo input:invalid:not(:placeholder-shown) { border-color: #e0a0a0; }
+
+    .mostrar {
+      position: absolute;
+      right: 6px;
+      padding: 6px;
+      border: none;
+      background: transparent;
+      color: var(--texto-suave);
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    .mostrar:hover { color: var(--azul); }
+
+    .solo-registro { display: flex; flex-direction: column; gap: 14px; animation: aparecer 0.4s ease; }
+
+    .boton-principal {
+      position: relative;
+      margin-top: 6px;
+      padding: 14px;
+      width: 100%;
+      font: inherit;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--jade) 0%, var(--azul) 100%);
+      box-shadow: 0 10px 24px rgba(30, 107, 255, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .boton-principal:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(30, 107, 255, 0.35); }
+    .boton-principal:active:not(:disabled) { transform: translateY(0); }
+    .boton-principal:disabled { opacity: 0.7; cursor: wait; }
+    .boton-principal .giro {
+      display: none;
+      width: 18px;
+      height: 18px;
+      margin: 0 auto;
+      border: 3px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: girar 0.8s linear infinite;
+    }
+    .cargando .texto-boton { display: none; }
+    .cargando .giro { display: block; }
+
+    .pie-form { text-align: center; margin: 2px 0 0; }
+    .enlace-pequeno {
+      padding: 2px;
+      border: none;
+      background: none;
+      font: inherit;
+      font-size: 0.85rem;
+      color: var(--azul-oscuro);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .enlace-pequeno:hover { color: var(--azul); }
+
+    .mensaje {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      animation: aparecer 0.3s ease;
+    }
+    .mensaje.ok { background: #d9f3ea; color: #12603f; }
+    .mensaje.error { background: #fbe1df; color: #8a1f1f; }
+
+    .pie {
+      margin-top: 22px;
+      font-size: 0.85rem;
+      color: rgba(255, 246, 227, 0.9);
+      text-align: center;
+    }
+
+    /* Animaciones */
+    @keyframes fondo { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    @keyframes flotar { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-18px) rotate(8deg); } }
+    @keyframes subir { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes aparecer { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 28px 14px; }
+      .cabecera h1 { font-size: 2rem; }
+      .tarjeta { padding: 24px 20px 22px; }
+      svg.flotante { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sprite de iconos (estilo línea) reutilizado con <use> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-reloj" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-corazon" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></symbol>
+    <symbol id="i-hoja" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19l7-7"/></symbol>
+    <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></symbol>
+    <symbol id="i-luna" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+    <symbol id="i-libro" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 5v16"/></symbol>
+    <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+    <symbol id="i-usuario" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></symbol>
+    <symbol id="i-tarjeta" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></symbol>
+    <symbol id="i-correo" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+    <symbol id="i-llave" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></symbol>
+    <symbol id="i-ojo" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  </svg>
+
+  <!-- Iconos decorativos de fondo -->
+  <svg class="flotante icono" style="top:8%; left:6%"><use href="#i-reloj"/></svg>
+  <svg class="flotante icono" style="top:14%; right:8%"><use href="#i-corazon"/></svg>
+  <svg class="flotante icono" style="top:55%; left:4%"><use href="#i-hoja"/></svg>
+  <svg class="flotante icono" style="bottom:10%; right:6%"><use href="#i-calendario"/></svg>
+  <svg class="flotante icono" style="bottom:8%; left:12%"><use href="#i-libro"/></svg>
+  <svg class="flotante icono" style="top:40%; right:4%"><use href="#i-gota"/></svg>
+  <svg class="flotante icono" style="top:70%; left:44%"><use href="#i-luna"/></svg>
+
+  <header class="cabecera">
+    <div class="logo"><svg class="icono"><use href="#i-reloj"/></svg></div>
+    <h1>Mi tiempo</h1>
+    <p>Organiza tus clases, tu trabajo y tu descanso, y cuida tus hábitos día a día.</p>
+    <div class="chips">
+      <span class="chip"><svg class="icono" style="width:16px;height:16px"><use href="#i-calendario"/></svg>Planifica</span>
+      <span class="chip"><svg class="icono" style="width:16px;height:16px"><use href="#i-check"/></svg>Cumple tus metas</span>
+      <span class="chip"><svg class="icono" style="width:16px;height:16px"><use href="#i-corazon"/></svg>Cuida tu salud</span>
+    </div>
+  </header>
+
+  <main class="tarjeta" id="tarjeta">
+    <div class="pestanas" id="pestanas" data-modo="login" role="tablist">
+      <span class="indicador"></span>
+      <button type="button" class="pestana activa" role="tab" aria-selected="true" data-modo="login">Iniciar sesión</button>
+      <button type="button" class="pestana" role="tab" aria-selected="false" data-modo="registro">Crear cuenta</button>
+    </div>
+
+    <h2 id="titulo">Bienvenido de nuevo</h2>
+    <p class="subtitulo" id="subtitulo">Ingresa con tu correo institucional y tu contraseña.</p>
+
+    <form id="formulario-acceso" novalidate>
+      <div class="solo-registro" hidden>
+        <label class="campo">Nombre completo
+          <span class="campo-entrada">
+            <svg class="icono"><use href="#i-usuario"/></svg>
+            <input type="text" name="nombre" autocomplete="name" placeholder="Ej. Ana María Pérez Quispe" maxlength="120" disabled>
+          </span>
+        </label>
+        <label class="campo">Código de estudiante
+          <span class="campo-entrada">
+            <svg class="icono"><use href="#i-tarjeta"/></svg>
+            <input type="text" name="codigo" autocomplete="off" placeholder="Ej. 2024101234" maxlength="20" disabled>
+          </span>
+        </label>
+      </div>
+
+      <label class="campo">
+        <span id="etiqueta-correo">Usuario (correo institucional)</span>
+        <span class="campo-entrada">
+          <svg class="icono"><use href="#i-correo"/></svg>
+          <input type="email" name="correo" autocomplete="username" placeholder="nombre@institucion.edu.pe" required>
+        </span>
+      </label>
+
+      <label class="campo">Contraseña
+        <span class="campo-entrada">
+          <svg class="icono"><use href="#i-llave"/></svg>
+          <input type="password" name="clave" autocomplete="current-password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+          <button type="button" class="mostrar" id="mostrar-clave" aria-label="Mostrar contraseña"><svg class="icono"><use href="#i-ojo"/></svg></button>
+        </span>
+      </label>
+
+      <div class="solo-registro" hidden>
+        <label class="campo">Confirmar contraseña
+          <span class="campo-entrada">
+            <svg class="icono"><use href="#i-llave"/></svg>
+            <input type="password" name="confirmar" autocomplete="new-password" placeholder="Repite tu contraseña" minlength="6" disabled>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="boton-principal" id="boton-acceso">
+        <span class="texto-boton">Entrar</span>
+        <span class="giro"></span>
+      </button>
+
+      <p class="pie-form" id="pie-olvide">
+        <button type="button" class="enlace-pequeno" id="olvide">¿Olvidaste tu contraseña?</button>
+      </p>
+
+      <div class="mensaje" id="mensaje" role="status" hidden></div>
+    </form>
+  </main>
+
+  <p class="pie">Herramienta de apoyo para la gestión del tiempo y los hábitos saludables.</p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://anqdtnswztrsnnfmdbor.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_rGSlgqlwMVXDT6e1086M8w_flAgSid7';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const PAGINA_DESTINO = 'actividades.html';
+
+    const tarjeta = document.getElementById('tarjeta');
+    const pestanas = document.getElementById('pestanas');
+    const formulario = document.getElementById('formulario-acceso');
+    const boton = document.getElementById('boton-acceso');
+    const mensaje = document.getElementById('mensaje');
+    const olvide = document.getElementById('olvide');
+    const piePsw = document.getElementById('pie-olvide');
+    const titulo = document.getElementById('titulo');
+    const subtitulo = document.getElementById('subtitulo');
+    const etiquetaCorreo = document.getElementById('etiqueta-correo');
+    let modo = 'login';
+
+    // Si ya hay una sesión activa, se entra directamente a la aplicación
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) location.replace(PAGINA_DESTINO);
+    });
+
+    function cambiarModo(nuevo) {
+      modo = nuevo;
+      pestanas.dataset.modo = nuevo;
+      const registro = nuevo === 'registro';
+
+      document.querySelectorAll('.pestana').forEach(p => {
+        const activa = p.dataset.modo === nuevo;
+        p.classList.toggle('activa', activa);
+        p.setAttribute('aria-selected', activa);
+      });
+
+      // Los campos de registro solo existen en ese modo; deshabilitados no bloquean el envío
+      document.querySelectorAll('.solo-registro').forEach(bloque => {
+        bloque.hidden = !registro;
+        bloque.querySelectorAll('input').forEach(i => { i.disabled = !registro; i.value = ''; });
+      });
+
+      titulo.textContent = registro ? 'Crea tu cuenta' : 'Bienvenido de nuevo';
+      subtitulo.textContent = registro
+        ? 'Regístrate con tus datos institucionales.'
+        : 'Ingresa con tu correo institucional y tu contraseña.';
+      etiquetaCorreo.textContent = registro ? 'Correo institucional' : 'Usuario (correo institucional)';
+      boton.querySelector('.texto-boton').textContent = registro ? 'Registrarme' : 'Entrar';
+      piePsw.hidden = registro;
+      ocultarMensaje();
+    }
+
+    function mostrarMensaje(tipo, texto) {
+      mensaje.className = 'mensaje ' + tipo;
+      mensaje.textContent = texto;
+      mensaje.hidden = false;
+    }
+
+    function ocultarMensaje() {
+      mensaje.hidden = true;
+      mensaje.textContent = '';
+    }
+
+    function cargando(activo) {
+      boton.disabled = activo;
+      boton.classList.toggle('cargando', activo);
+    }
+
+    // Traduce los errores de Supabase Auth a un mensaje claro en español
+    function traducirError(error) {
+      const texto = (error && error.message) || '';
+      if (texto.includes('Invalid login credentials')) return 'Usuario o contraseña incorrectos.';
+      if (texto.includes('Email not confirmed')) return 'Confirma tu correo institucional antes de entrar.';
+      if (texto.includes('already registered')) return 'Ya existe una cuenta con ese correo.';
+      if (texto.includes('Database error saving new user')) return 'No se pudo guardar el registro. Revisa que el código o el correo no estén ya registrados.';
+      if (texto.includes('at least 6')) return 'La contraseña debe tener al menos 6 caracteres.';
+      if (texto.includes('For security purposes') || texto.includes('rate limit')) return 'Demasiados intentos. Espera unos segundos e inténtalo de nuevo.';
+      return texto || 'Ocurrió un error. Inténtalo de nuevo.';
+    }
+
+    function irAlInicio(texto) {
+      mostrarMensaje('ok', texto);
+      setTimeout(() => location.href = PAGINA_DESTINO, 900);
+    }
+
+    async function iniciarSesion(correo, clave) {
+      cargando(true);
+      const { error } = await supabase.auth.signInWithPassword({ email: correo, password: clave });
+      cargando(false);
+      if (error) return mostrarMensaje('error', traducirError(error));
+      irAlInicio('¡Bienvenido! Entrando a tu agenda…');
+    }
+
+    async function registrarUsuario(datos) {
+      cargando(true);
+      // Los datos viajan en metadatos: un trigger en la base los copia a la tabla usuarios
+      const { data, error } = await supabase.auth.signUp({
+        email: datos.correo,
+        password: datos.clave,
+        options: {
+          data: {
+            nombre_completo: datos.nombre,
+            codigo_estudiante: datos.codigo,
+            correo_institucional: datos.correo
+          }
+        }
+      });
+      cargando(false);
+      if (error) return mostrarMensaje('error', traducirError(error));
+
+      if (data.session) return irAlInicio('¡Cuenta creada! Entrando a tu agenda…');
+
+      // Si Supabase exige confirmar el correo, no hay sesión todavía
+      cambiarModo('login');
+      formulario.correo.value = datos.correo;
+      mostrarMensaje('ok', 'Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
+    }
+
+    pestanas.addEventListener('click', e => {
+      const pestana = e.target.closest('.pestana');
+      if (pestana && pestana.dataset.modo !== modo) cambiarModo(pestana.dataset.modo);
+    });
+
+    document.getElementById('mostrar-clave').addEventListener('click', e => {
+      const campo = formulario.clave;
+      const mostrar = campo.type === 'password';
+      campo.type = mostrar ? 'text' : 'password';
+      e.currentTarget.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+
+    formulario.addEventListener('submit', async e => {
+      e.preventDefault();
+      ocultarMensaje();
+
+      const correo = formulario.correo.value.trim().toLowerCase();
+      const clave = formulario.clave.value;
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+        return mostrarMensaje('error', 'Escribe un correo institucional válido.');
+      }
+      if (clave.length < 6) {
+        return mostrarMensaje('error', 'La contraseña debe tener al menos 6 caracteres.');
+      }
+
+      if (modo === 'login') return iniciarSesion(correo, clave);
+
+      const nombre = formulario.nombre.value.trim().replace(/\s+/g, ' ');
+      const codigo = formulario.codigo.value.trim().toUpperCase();
+
+      if (nombre.split(' ').length < 2) {
+        return mostrarMensaje('error', 'Escribe tu nombre completo (nombres y apellidos).');
+      }
+      if (!/^[A-Z0-9-]{4,20}$/.test(codigo)) {
+        return mostrarMensaje('error', 'El código de estudiante debe tener entre 4 y 20 letras o números.');
+      }
+      if (clave !== formulario.confirmar.value) {
+        return mostrarMensaje('error', 'Las contraseñas no coinciden.');
+      }
+
+      registrarUsuario({ nombre, codigo, correo, clave });
+    });
+
+    olvide.addEventListener('click', async () => {
+      const correo = formulario.correo.value.trim().toLowerCase();
+      if (!correo) {
+        return mostrarMensaje('error', 'Escribe tu correo institucional en el campo Usuario y vuelve a pulsar el enlace.');
+      }
+      cargando(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(correo, { redirectTo: location.href });
+      cargando(false);
+      if (error) return mostrarMensaje('error', traducirError(error));
+      mostrarMensaje('ok', 'Te enviamos un enlace a tu correo para restablecer la contraseña.');
+    });
+  </script>
+</body>
+</html>
